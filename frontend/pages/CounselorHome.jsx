@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import API from '../api/axios.js';
 import { useNavigate } from "react-router-dom";
 import { UserPlus, Search, ExternalLink } from "lucide-react";
 
 function CounselorHome() {
     const [students, setStudents] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
     const [newEmail, setNewEmail] = useState("");
+    const [showDropdown, setShowDropdown] = useState(false);
     const [loading, setLoading] = useState(false);
     const [fetchLoading, setFetchLoading] = useState(true); // Added for initial load state
+    const dropdownRef = useRef(null);
     const navigate = useNavigate();
 
     const fetchMyStudents = async () => {
@@ -21,7 +25,47 @@ function CounselorHome() {
         }
     };
 
-    useEffect(() => { fetchMyStudents(); }, []);
+    const fetchAllPotentialStudents = async () => {
+        try {
+            // Adjust this endpoint to wherever you can get a list of all students
+            const res = await API.get("/api/admin/students", { withCredentials: true });
+            setAllUsers(res.data.students);
+        } catch (err) { console.error("Error fetching all students:", err); }
+    };
+
+    useEffect(() => {
+        fetchMyStudents();
+        fetchAllPotentialStudents();
+        
+        // Close dropdown when clicking outside
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setNewEmail(value);
+        if (value.length > 0) {
+            const matches = allUsers.filter(u => 
+                u.username?.toLowerCase().includes(value.toLowerCase()) || 
+                u.email?.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredUsers(matches);
+            setShowDropdown(true);
+        } else {
+            setShowDropdown(false);
+        }
+    };
+
+    const selectUser = (user) => {
+        setNewEmail(user.email);
+        setShowDropdown(false);
+    };
 
     const handleAddStudent = async (e) => {
         e.preventDefault();
@@ -52,30 +96,45 @@ function CounselorHome() {
                 </div>
 
                 <form onSubmit={handleAddStudent} className="flex gap-4 items-end mb-8 bg-blue-50 p-6 rounded-xl border border-blue-200">
-                    <div className="flex-1">
-                        <label className="form-label">Add New Student</label>
+                    <div className="flex-1 relative" ref={dropdownRef}>
+                        <label className="form-label block mb-1 font-semibold text-blue-900">Search and Add Student</label>
                         <div className="relative">
-                          <Search className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
-                          <input 
-                              type="email" 
-                              placeholder="student@college.edu"
-                              className="form-input w-full pl-10 bg-white"
-                              value={newEmail}
-                              onChange={(e) => setNewEmail(e.target.value)}
-                              required
-                          />
+                            <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                            <input 
+                                type="text" 
+                                placeholder="Search by name or email..."
+                                className="form-input w-full pl-10 pr-4 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                value={newEmail}
+                                onChange={handleInputChange}
+                                onFocus={() => newEmail.length > 0 && setShowDropdown(true)}
+                                required
+                            />
                         </div>
+
+                        {/* Dropdown List */}
+                        {showDropdown && filteredUsers.length > 0 && (
+                            <ul className="absolute z-50 w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+                                {filteredUsers.map((user) => (
+                                    <li 
+                                        key={user._id}
+                                        onClick={() => selectUser(user)}
+                                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer flex justify-between items-center border-b last:border-none"
+                                    >
+                                        <div>
+                                            <p className="font-medium text-gray-800">{user.username}</p>
+                                            <p className="text-sm text-gray-500">{user.email}</p>
+                                        </div>
+                                        <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-400">{user.usn || 'No USN'}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className={`btn ${loading ? 'bg-blue-400' : 'btn-primary'}`}
+                        className={`btn h-[42px] px-6 rounded-lg font-bold text-white transition ${loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'}`}
                     >
-                        {loading ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                        ) : (
-                            <UserPlus size={18} />
-                        )}
                         {loading ? "Adding..." : "Add"}
                     </button>
                 </form>
@@ -113,8 +172,14 @@ function CounselorHome() {
                                         <span className="text-orange-500">{student.pendingPoints || 0}</span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <span className="text-blue-600 flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                                            View Profile <ExternalLink size={16} />
+                                        <span 
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // 🔑 prevents row click
+                                                navigate(`/counselor/edit-student/${student._id}`);
+                                            }}
+                                            className="text-blue-600 flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                        >
+                                            Edit Profile <ExternalLink size={16} />
                                         </span>
                                     </td>
                                 </tr>
