@@ -51,7 +51,7 @@ function App() {
         </Route>
 
         {/* Admin Only Routes */}
-        <Route element={<ProtectedRoute requiredRole={['admin', 'service']} />}>
+        <Route element={<ProtectedRoute requiredRole={['admin', 'counselor', 'service']} />}>
           <Route path="/admin" element={<AdminHome />} />
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/students" element={<StudentsList />} />

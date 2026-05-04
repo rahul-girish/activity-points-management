@@ -7,13 +7,18 @@ function CounselorHome() {
     const [students, setStudents] = useState([]);
     const [newEmail, setNewEmail] = useState("");
     const [loading, setLoading] = useState(false);
+    const [fetchLoading, setFetchLoading] = useState(true); // Added for initial load state
     const navigate = useNavigate();
 
     const fetchMyStudents = async () => {
         try {
             const res = await API.get("/api/counselor/my-students", { withCredentials: true });
             setStudents(res.data);
-        } catch (err) { console.error(err); }
+        } catch (err) { 
+            console.error(err); 
+        } finally {
+            setFetchLoading(false);
+        }
     };
 
     useEffect(() => { fetchMyStudents(); }, []);
@@ -43,6 +48,7 @@ function CounselorHome() {
             <div className="max-w-6xl mx-auto bg-white rounded-2xl p-8 shadow-md">
                 <h1 className="text-3xl text-gray-700 mb-6 font-bold">Counselor Dashboard</h1>
 
+                {/* Add Student Form */}
                 <form onSubmit={handleAddStudent} className="flex gap-4 mb-10 bg-gray-50 p-6 rounded-xl border border-gray-200">
                     <div className="flex-1 relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -69,6 +75,7 @@ function CounselorHome() {
                     </button>
                 </form>
 
+                {/* Students Table */}
                 <table className="w-full text-left border-collapse border-2 border-gray-200">
                     <thead>
                         <tr className="bg-gray-100 text-gray-600 font-semibold text-lg">
@@ -80,29 +87,40 @@ function CounselorHome() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                        {students.map(student => (
-                            <tr key={student._id} className="hover:bg-gray-50 transition text-gray-600 text-lg">
-                                <td className="px-6 py-4 font-medium">{student.username}</td>
-                                <td className="px-6 py-4 font-mono">{student.usn || "NOT SET"}</td>
-                                <td className="px-6 py-4">{student.branch || "N/A"}</td>
-                                <td className="px-6 py-4 text-center">
-                                    <span className="text-green-600 font-bold">{student.confirmedPoints}</span>
-                                    <span className="mx-1">/</span>
-                                    <span className="text-orange-500">{student.pendingPoints}</span>
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <button 
-                                        onClick={() => navigate(`/counselor/edit-student/${student._id}`)}
-                                        className="text-blue-600 hover:text-blue-800 flex items-center gap-1 ml-auto"
-                                    >
-                                        Edit Profile <ExternalLink size={16} />
-                                    </button>
-                                </td>
+                        {fetchLoading ? (
+                            <tr>
+                                <td colSpan="5" className="text-center py-10 text-gray-500">Loading students...</td>
                             </tr>
-                        ))}
+                        ) : students.length > 0 ? (
+                            students.map(student => (
+                                <tr 
+                                    key={student._id} 
+                                    // Make the whole row clickable
+                                    onClick={() => navigate(`/admin/students/${student._id}`)}
+                                    className="hover:bg-blue-50 transition text-gray-600 text-lg cursor-pointer group"
+                                >
+                                    <td className="px-6 py-4 font-medium group-hover:text-blue-700">{student.username}</td>
+                                    <td className="px-6 py-4 font-mono">{student.usn || "NOT SET"}</td>
+                                    <td className="px-6 py-4">{student.branch || "N/A"}</td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span className="text-green-600 font-bold">{student.confirmedPoints || 0}</span>
+                                        <span className="mx-1 text-gray-400">/</span>
+                                        <span className="text-orange-500">{student.pendingPoints || 0}</span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <span className="text-blue-600 flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                            View Profile <ExternalLink size={16} />
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="text-center py-10 text-gray-400 italic">No students assigned yet.</td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
-                {students.length === 0 && <p className="text-center py-10 text-gray-400 italic">No students assigned yet.</p>}
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ function StudentsList() {
     
     const navigate = useNavigate();
 
-    const branches = ["AS", "BT", "CD", "CH", "CI", "CS", "CV", "CY", "EC", "EE", "ET", "IM", "IS", "ME"];
+    const branches = ["AI", "AS", "BT", "CD", "CH", "CI", "CS", "CV", "CY", "EC", "EE", "ET", "IM", "IS", "ME"];
     const years = [1, 2, 3, 4];
 
     const fetchStudents = async () => {
