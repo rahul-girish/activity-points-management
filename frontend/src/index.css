@@ -13,6 +13,7 @@
 }
 
 @import "tailwindcss";
+@import "./design-system.css";
 
 @theme {
     --font-sans: "Ubuntu", "sans-serif";

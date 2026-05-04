@@ -1,4 +1,5 @@
 import express from 'express';
+import axios from 'axios';
 import User from '../models/User.js';
 import Event from '../models/Event.js';
 import Activity from '../models/Activity.js';
@@ -8,6 +9,22 @@ import { syncUserPoints } from '../services/pointsService.js';
 
 
 const router = express.Router();
+
+router.get('/proxy-poster/:fileId', async (req, res) => {
+    try {
+        const { fileId } = req.params;
+        const response = await axios.get(`https://drive.google.com/uc?export=view&id=${fileId}`, {
+            responseType: 'arraybuffer',
+            timeout: 10000
+        });
+        res.set('Content-Type', response.headers['content-type'] || 'image/jpeg');
+        res.set('Cache-Control', 'public, max-age=3600');
+        res.send(response.data);
+    } catch (error) {
+        console.error('Poster proxy error:', error.message);
+        res.status(500).json({ message: "Failed to fetch poster", error: error.message });
+    }
+});
 
 router.get('/', async(req, res) => {
     try {

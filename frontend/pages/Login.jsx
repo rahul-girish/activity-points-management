@@ -1,6 +1,8 @@
 import React from 'react'
 
 function Login() {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   return (
     <div className="flex min-h-[calc(100vh-5rem)] justify-center items-center bg-gray-100">
       <div className="min-w-md text-center items-center px-10 py-10 bg-white shadow-md border-transparent rounded-xl">
@@ -12,7 +14,7 @@ function Login() {
           className="bg-white hover:bg-gray-50 text-lg text-gray-500 text-left border-2 
          border-gray-300 hover:border-blue-100 rounded-2xl pl-8 py-5 mx-5 w-xs flex
           shadow-md active:shadow-none active:translate-y-0.5 active:scale-[0.99]"
-          onClick={() => window.open(`${import.meta.env.VITE_API_URL}/api/auth/google`, "_self")}
+          onClick={() => window.open(`${apiUrl}/api/auth/google`, "_self")}
         >
           <span className="mr-2">
             Login with Google

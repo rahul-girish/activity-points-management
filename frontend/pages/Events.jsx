@@ -11,7 +11,11 @@ const StudentEvents = () => {
     const formatPosterUrl = (url) => {
         if (!url || !url.includes('drive.google.com')) return url;
         const match = url.match(/\/d\/(.+?)\/(view|edit)?/);
-        return match ? `https://drive.google.com/uc?export=view&id=${match[1]}` : url;
+        if (match) {
+            const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            return `${backendUrl}/api/events/proxy-poster/${match[1]}`;
+        }
+        return url;
     };
 
     useEffect(() => {

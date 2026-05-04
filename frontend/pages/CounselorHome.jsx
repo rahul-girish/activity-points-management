@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from '../api/axios.js';
 import { useNavigate } from "react-router-dom";
-import { UserPlus, Search, ExternalLink } from "lucide-react";
+import { UserPlus, Search } from "lucide-react";
 
 function CounselorHome() {
     const [students, setStudents] = useState([]);
@@ -44,34 +44,39 @@ function CounselorHome() {
     };
 
     return (
-        <div className="bg-gray-100 min-h-screen py-8 px-10">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl p-8 shadow-md">
-                <h1 className="text-3xl text-gray-700 mb-6 font-bold">Counselor Dashboard</h1>
+        <div className="bg-gray-100 min-h-[calc(100vh-5rem)] py-8 px-4 md:px-8">
+            <div className="max-w-6xl mx-auto bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+                <div className='mb-8'>
+                  <h1 className="text-heading-xl text-gray-900">Counselor Dashboard</h1>
+                  <p className='text-small-secondary mt-2'>Add and manage your assigned students</p>
+                </div>
 
-                {/* Add Student Form */}
-                <form onSubmit={handleAddStudent} className="flex gap-4 mb-10 bg-gray-50 p-6 rounded-xl border border-gray-200">
-                    <div className="flex-1 relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input 
-                            type="email" 
-                            placeholder="Enter student email to add them..."
-                            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 outline-none focus:ring-2 focus:ring-blue-500"
-                            value={newEmail}
-                            onChange={(e) => setNewEmail(e.target.value)}
-                            required
-                        />
+                <form onSubmit={handleAddStudent} className="flex gap-4 items-end mb-8 bg-blue-50 p-6 rounded-xl border border-blue-200">
+                    <div className="flex-1">
+                        <label className="form-label">Add New Student</label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+                          <input 
+                              type="email" 
+                              placeholder="student@college.edu"
+                              className="form-input w-full pl-10 bg-white"
+                              value={newEmail}
+                              onChange={(e) => setNewEmail(e.target.value)}
+                              required
+                          />
+                        </div>
                     </div>
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className={`${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white px-6 py-3 rounded-lg flex items-center gap-2 transition font-semibold`}
+                        className={`btn ${loading ? 'bg-blue-400' : 'btn-primary'}`}
                     >
                         {loading ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                         ) : (
-                            <UserPlus size={20} />
+                            <UserPlus size={18} />
                         )}
-                        {loading ? "Adding..." : "Add Student"}
+                        {loading ? "Adding..." : "Add"}
                     </button>
                 </form>
 

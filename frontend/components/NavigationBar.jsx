@@ -44,16 +44,16 @@ function NavigationBar() {
   }, []);
 
   return (
-    <div className="h-20 bg-[#555555] text-[#edebeb] flex sticky top-0 z-10 justify-between px-5">
+    <div className="h-20 bg-blue-900 text-white flex sticky top-0 z-10 justify-between px-5 shadow-md">
 
       <button onClick={handleHomeClick}
-        className="text-3xl py-3"
+        className="text-3xl py-3 font-semibold hover:text-blue-100 transition-colors duration-300"
       >Activity Points Tracker (Beta)
       </button>
 
       <div className="flex">
         <button onClick={handleHomeClick}
-          className="px-5 text-xl hover:bg-[#474747] transition duration-300 flex items-center"
+          className="px-5 text-lg hover:bg-blue-800 transition duration-300 flex items-center font-medium"
         >
           Home
         </button>
@@ -62,7 +62,7 @@ function NavigationBar() {
           navigate("/about");
         }
         }
-          className="px-5 text-xl hover:bg-[#474747] transition duration-300 flex items-center"
+          className="px-5 text-lg hover:bg-blue-800 transition duration-300 flex items-center font-medium"
         >
           About
         </button>
@@ -72,17 +72,17 @@ function NavigationBar() {
             <div className="relative flex" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="px-5 text-xl hover:bg-[#474747] transition duration-300 flex items-center"
+                className="px-5 text-lg hover:bg-blue-800 transition duration-300 flex items-center"
               >
                 <img
                   src={user.profilePic}
                   alt="Profile"
-                  className="w-10 h-10 rounded-full border-2 border-[#edebeb]"
+                  className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
                 />
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 min-w-60 top-20 text-xl text-gray-700 bg-white shadow-lg transform origin-top transition-all">
+                <div className="absolute right-0 min-w-60 top-20 text-base text-gray-700 bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden z-20 transform origin-top transition-all">
                   
                   {user.role === 'student' && (
                     <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
